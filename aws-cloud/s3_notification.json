@@ -1,0 +1,8 @@
+{
+  "LambdaFunctionConfigurations": [
+    {
+      "LambdaFunctionArn": "arn:aws:lambda:ap-southeast-2:059365270618:function:DisneyCrowdFrameProcessor",
+      "Events": ["s3:ObjectCreated:*"]
+    }
+  ]
+}

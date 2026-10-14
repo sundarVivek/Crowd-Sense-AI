@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disney Crowd Sense AI - AWS Hackathon MVP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* WhatsApp custom scrollbars and chat pattern */
+    .whatsapp-bg {
+      background-color: #0b141a;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-down {
+      animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="h-16 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 flex items-center justify-center text-xl shadow-lg shadow-orange-500/20 ring-1 ring-white/20">
+        🏰
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Disney Crowd Sense AI</span>
+          <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-400 border border-orange-500/30">
+            AWS CDS Hackathon MVP
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400 hidden sm:block">Real-time Rekognition Queue Analytics & Bedrock WhatsApp Assistant</p>
+      </div>
+    </div>
+
+    <!-- Live AWS Architecture Status Badges -->
+    <div class="flex items-center gap-2 text-xs">
+      <div class="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-medium text-[11px]">Bedrock AgentCore</span>
+      </div>
+      <div class="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+        <span class="font-medium text-[11px]">Rekognition Vision</span>
+      </div>
+      <div class="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span class="font-medium text-[11px]">DynamoDB</span>
+      </div>
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span class="font-semibold text-[11px]">AWS End User Messaging</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dual-Panel Workspace -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 md:p-6 grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+    <!-- LEFT PANEL: Admin Park Queue & Vision Operations (7 Cols) -->
+    <section class="xl:col-span-7 flex flex-col gap-6">
+
+      <!-- Admin Overview Card -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl backdrop-blur relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>Park Attraction Feeds & Crowd Controls</span>
+              <span id="rides-count-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">8 Attractions</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Live queue analytics synched with Amazon DynamoDB. Override wait times or simulate surges.</p>
+          </div>
+          
+          <!-- Quick Filter Tabs -->
+          <div class="flex items-center gap-1 bg-slate-950/70 p-1 rounded-xl border border-slate-800 text-xs" id="land-filters">
+            <button onclick="filterLand('ALL')" class="filter-btn active px-2.5 py-1 rounded-lg font-medium bg-orange-500 text-white transition">All</button>
+            <button onclick="filterLand('Tomorrowland')" class="filter-btn px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition">Tomorrowland</button>
+            <button onclick="filterLand('Fantasyland')" class="filter-btn px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition">Fantasyland</button>
+            <button onclick="filterLand('New Orleans Square')" class="filter-btn px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition">New Orleans</button>
+          </div>
+        </div>
+
+        <!-- Rides Grid / List -->
+        <div id="rides-list" class="space-y-3 custom-scroll max-h-[460px] overflow-y-auto pr-1">
+          <!-- Populated by JavaScript -->
+          <div class="text-center py-10 text-slate-500 text-sm">Loading attractions from DynamoDB...</div>
+        </div>
+      </div>
+
+      <!-- Vision Pipeline Simulator Card (Rekognition) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl backdrop-blur">
+        <div class="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold text-white">Amazon Rekognition Queue Vision Analyzer</span>
+              <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">DetectLabels AI</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Simulate real-time camera snapshot ingestion: counts people in queue and recomputes wait times.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Upload Box -->
+          <div class="border-2 border-dashed border-slate-800 hover:border-orange-500/50 rounded-2xl p-5 flex flex-col items-center justify-center text-center transition bg-slate-950/40 group">
+            <div class="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition">
+              📷
+            </div>
+            <p class="text-xs font-semibold text-slate-200">Upload Camera Snapshot</p>
+            <p class="text-[11px] text-slate-500 mt-1 mb-3">PNG, JPG queue photos for Rekognition analysis</p>
+            <label class="cursor-pointer px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold shadow-lg shadow-orange-500/20 transition">
+              <span>Choose Image</span>
+              <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+            </label>
+          </div>
+
+          <!-- Quick Presets -->
+          <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
+            <div>
+              <p class="text-xs font-semibold text-slate-300 mb-2">Or Run Live Vision Preset:</p>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button onclick="runVisionPreset('space_mountain', 'HIGH', 56)" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-left transition">
+                  <div class="font-bold text-red-300">Space Mountain</div>
+                  <div class="text-[10px] text-red-400/80">Packed Queue (56 ppl)</div>
+                </button>
+                <button onclick="runVisionPreset('space_mountain', 'LOW', 11)" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-left transition">
+                  <div class="font-bold text-emerald-300">Space Mountain</div>
+                  <div class="text-[10px] text-emerald-400/80">Queue Cleared (11 ppl)</div>
+                </button>
+                <button onclick="runVisionPreset('star_tours', 'LOW', 8)" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-left transition">
+                  <div class="font-bold text-emerald-300">Star Tours</div>
+                  <div class="text-[10px] text-emerald-400/80">Walk-on (8 ppl)</div>
+                </button>
+                <button onclick="runVisionPreset('pirates_caribbean', 'MEDIUM', 28)" class="p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-left transition">
+                  <div class="font-bold text-amber-300">Pirates</div>
+                  <div class="text-[10px] text-amber-400/80">Moderate (28 ppl)</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Vision Status Readout -->
+            <div id="vision-status" class="mt-3 text-[11px] text-slate-400 bg-slate-900 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+              <span>Ready for frame processing</span>
+              <span class="text-emerald-400 font-mono text-[10px]">REKOGNITION_STANDBY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Guest Mobile WhatsApp Simulator (5 Cols) -->
+    <section class="xl:col-span-5 flex flex-col items-center justify-center">
+
+      <!-- Smartphone Device Mockup Container -->
+      <div class="w-full max-w-[420px] bg-[#121b22] border-[6px] border-slate-800 rounded-[3rem] shadow-2xl flex flex-col overflow-hidden h-[740px] relative ring-1 ring-white/10">
+
+        <!-- Top Phone Bezel Notch / Speaker -->
+        <div class="h-6 bg-[#1f2c34] flex items-center justify-center relative select-none">
+          <div class="w-20 h-4 bg-black rounded-b-xl flex items-center justify-center">
+            <div class="w-3 h-3 rounded-full bg-slate-900 border border-slate-800 mr-2"></div>
+            <div class="w-8 h-1 bg-slate-800 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- In-Phone Real-Time Alert Toast (Shows when Wait Time Drops) -->
+        <div id="whatsapp-toast" class="hidden absolute top-7 left-3 right-3 z-30 bg-[#202c33] border border-emerald-500/40 rounded-2xl p-3 shadow-2xl animate-slide-down">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center text-sm shrink-0">
+              🔔
+            </div>
+            <div class="flex-1 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-emerald-400">WhatsApp Notification</span>
+                <span class="text-[10px] text-slate-400">now</span>
+              </div>
+              <p id="whatsapp-toast-text" class="text-slate-200 text-[11px] mt-0.5 leading-snug">
+                Wait time alert for Space Mountain!
+              </p>
+            </div>
+            <button onclick="dismissToast()" class="text-slate-400 hover:text-white text-xs">✕</button>
+          </div>
+        </div>
+
+        <!-- WhatsApp Header -->
+        <div class="bg-[#1f2c34] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-white shrink-0">
+          <div class="flex items-center gap-3">
+            <button class="text-slate-300 hover:text-white text-lg">←</button>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-xl shadow relative ring-1 ring-white/20">
+              🏰
+              <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-[#1f2c34]"></span>
+            </div>
+            <div>
+              <div class="text-sm font-bold flex items-center gap-1.5 leading-tight">
+                <span>Disney Assistant</span>
+                <span class="text-[11px] text-emerald-400" title="Verified Business">✓</span>
+              </div>
+              <div class="text-[10px] text-emerald-400 font-medium">AWS Bedrock & Social Messaging</div>
+            </div>
+          </div>
+
+          <!-- Top Call / Menu Icons -->
+          <div class="flex items-center gap-4 text-slate-300 text-sm">
+            <button title="Video Call" class="hover:text-white">📹</button>
+            <button title="Phone Call" class="hover:text-white">📞</button>
+            <button title="Menu" class="hover:text-white">⋮</button>
+          </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="bg-[#182229] px-3 py-2 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto custom-scroll text-[11px] shrink-0">
+          <button onclick="quickPrompt('What is the wait time for Space Mountain?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
+            🚀 Space Mountain
+          </button>
+          <button onclick="quickPrompt('Which rides have the shortest wait right now?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
+            ✨ Shortest lines
+          </button>
+          <button onclick="quickPrompt('Alert me when Space Mountain drops under 30 mins')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
+            🔔 Set 30m Alert
+          </button>
+          <button onclick="quickPrompt('Pirates of the Caribbean wait time?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
+            🏴‍☠️ Pirates
+          </button>
+        </div>
+
+        <!-- WhatsApp Chat Messages Body -->
+        <div id="chat-messages" class="flex-1 whatsapp-bg p-4 overflow-y-auto space-y-3 custom-scroll text-xs">
+          <!-- Date Pill -->
+          <div class="text-center my-1">
+            <span class="bg-[#182229] text-[10px] text-slate-400 font-medium px-2.5 py-1 rounded-lg uppercase tracking-wider">
+              Today
+            </span>
+          </div>
+
+          <!-- Welcome Message -->
+          <div class="flex justify-start">
+            <div class="max-w-[85%] rounded-2xl rounded-tl-none p-3 shadow-md bg-[#202c33] text-slate-100 border border-slate-800">
+              <p class="leading-relaxed">
+                👋 *Welcome to Disneyland!* I'm your AI Crowd Assistant powered by Amazon Bedrock & Rekognition.
+              </p>
+              <p class="mt-2 text-slate-300 leading-relaxed">
+                Ask me about any ride queue, find shortest lines, or let me know if you want a WhatsApp alert when a busy ride clears up!
+              </p>
+              <span class="text-[9px] text-slate-400 block text-right mt-1.5 font-mono">11:20 AM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Input Area -->
+        <div class="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800 shrink-0">
+          <button class="text-slate-400 hover:text-white text-base">😊</button>
+          <button class="text-slate-400 hover:text-white text-base">📎</button>
+          <input 
+            type="text" 
+            id="chat-input" 
+            placeholder="Type a message..." 
+            class="flex-1 bg-[#2a3942] text-xs text-white placeholder-slate-400 px-3.5 py-2.5 rounded-2xl border border-slate-700/60 focus:outline-none focus:border-emerald-500"
+            onkeypress="if(event.key === 'Enter') sendUserMessage()"
+          />
+          <button 
+            onclick="sendUserMessage()" 
+            class="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white flex items-center justify-center transition shadow-lg shadow-emerald-900/30 shrink-0"
+          >
+            ➤
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Live Toast Sound / Audio Hook -->
+  <script>
+    let ridesData = [];
+    let currentFilter = 'ALL';
+    const API_BASE = window.location.origin.includes('localhost') ? window.location.origin : 'http://localhost:5000';
+
+    // Format WhatsApp markdown (bold *text*, bullet points, emojis)
+    function formatWhatsAppText(text) {
+      if (!text) return '';
+      let formatted = text
+        .replace(/\*(.*?)\*/g, '<strong class="font-bold text-white">$1</strong>')
+        .replace(/\n/g, '<br/>');
+      return formatted;
+    }
+
+    // Initialize Park Data
+    async function fetchRides() {
+      try {
+        const res = await fetch(`${API_BASE}/api/rides`);
+        if (res.ok) {
+          ridesData = await res.json();
+          renderRides();
+        }
+      } catch (err) {
+        console.warn('API fetch failed, falling back to local simulation data', err);
+      }
+    }
+
+    function renderRides() {
+      const container = document.getElementById('rides-list');
+      if (!container) return;
+
+      const filtered = currentFilter === 'ALL' 
+        ? ridesData 
+        : ridesData.filter(r => r.land === currentFilter);
+
+      document.getElementById('rides-count-badge').textContent = `${filtered.length} Attractions`;
+
+      container.innerHTML = filtered.map(ride => {
+        const isHigh = ride.crowdLevel === 'HIGH';
+        const isMed = ride.crowdLevel === 'MEDIUM';
+        const badgeClass = isHigh 
+          ? 'bg-red-500/20 text-red-400 border-red-500/30' 
+          : (isMed ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30');
+
+        return `
+          <div class="bg-slate-950/60 border border-slate-800/80 hover:border-slate-700/80 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition group">
+            <div class="flex-1">
+              <div class="flex items-center gap-2.5">
+                <span class="font-bold text-sm text-slate-100 group-hover:text-orange-400 transition">${ride.rideName}</span>
+                <span class="text-[10px] px-2.5 py-0.5 rounded-full border font-bold uppercase tracking-wider ${badgeClass}">
+                  ${ride.crowdLevel} (${ride.estimatedWaitMinutes}m)
+                </span>
+              </div>
+              <div class="flex items-center gap-4 text-xs text-slate-400 mt-1">
+                <span>Land: <strong class="text-slate-300 font-medium">${ride.land}</strong></span>
+                <span>•</span>
+                <span>Camera Headcount: <strong class="text-slate-300 font-medium">${ride.personCount} guests</strong></span>
+              </div>
+            </div>
+
+            <!-- Fast Simulation Buttons -->
+            <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
+              <button onclick="simulateSurge('${ride.rideId}')" class="flex-1 md:flex-initial text-xs bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-600/40 px-3 py-1.5 rounded-xl transition font-medium flex items-center justify-center gap-1">
+                <span>Surge</span>
+                <span class="text-[10px] opacity-80">(75m)</span>
+              </button>
+              <button onclick="simulateClear('${ride.rideId}')" class="flex-1 md:flex-initial text-xs bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-600/40 px-3 py-1.5 rounded-xl transition font-medium flex items-center justify-center gap-1">
+                <span>Clear</span>
+                <span class="text-[10px] opacity-80">(15m)</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterLand(land) {
+      currentFilter = land;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('bg-orange-500', 'text-white');
+        b.classList.add('text-slate-400');
+      });
+      event.target.classList.add('bg-orange-500', 'text-white');
+      event.target.classList.remove('text-slate-400');
+      renderRides();
+    }
+
+    // Trigger Surge
+    async function simulateSurge(rideId) {
+      const ride = ridesData.find(r => r.rideId === rideId);
+      if (!ride) return;
+      ride.personCount = 55;
+      ride.estimatedWaitMinutes = 75;
+      ride.crowdLevel = 'HIGH';
+      renderRides();
+
+      try {
+        await fetch(`${API_BASE}/api/rides`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ride)
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // Trigger Clear (This will fire proactive alerts!)
+    async function simulateClear(rideId) {
+      const ride = ridesData.find(r => r.rideId === rideId);
+      if (!ride) return;
+      ride.personCount = 12;
+      ride.estimatedWaitMinutes = 15;
+      ride.crowdLevel = 'LOW';
+      renderRides();
+
+      try {
+        await fetch(`${API_BASE}/api/rides`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ride)
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // Rekognition Presets
+    async function runVisionPreset(rideId, level, count) {
+      const waitMinutes = count < 15 ? 10 : (count < 40 ? 25 : Math.round(count * 1.5));
+      const statusEl = document.getElementById('vision-status');
+      statusEl.innerHTML = `
+        <span class="text-orange-400 animate-pulse">Running Rekognition DetectLabels on ${rideId}...</span>
+        <span class="text-orange-400 font-mono text-[10px]">ANALYZING_QUEUE</span>
+      `;
+
+      setTimeout(async () => {
+        const ride = ridesData.find(r => r.rideId === rideId);
+        if (ride) {
+          ride.personCount = count;
+          ride.estimatedWaitMinutes = waitMinutes;
+          ride.crowdLevel = level;
+          renderRides();
+          try {
+            await fetch(`${API_BASE}/api/rides`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(ride)
+            });
+          } catch(e) {}
+        }
+
+        statusEl.innerHTML = `
+          <span class="text-emerald-400">Detected <strong>${count} Person</strong> instances in ${rideId} (Wait: ${waitMinutes}m)</span>
+          <span class="text-emerald-400 font-mono text-[10px]">SYNCHED_DYNAMODB</span>
+        `;
+      }, 700);
+    }
+
+    // Image Upload
+    async function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const statusEl = document.getElementById('vision-status');
+      statusEl.innerHTML = `
+        <span class="text-blue-400 animate-pulse">Uploading frame to S3 & executing Amazon Rekognition...</span>
+        <span class="text-blue-400 font-mono text-[10px]">FRAME_INGESTION</span>
+      `;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/rides/analyze-feed/space_mountain`, {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          const idx = ridesData.findIndex(r => r.rideId === updated.rideId);
+          if (idx >= 0) ridesData[idx] = updated;
+          renderRides();
+
+          statusEl.innerHTML = `
+            <span class="text-emerald-400">Amazon Rekognition detected <strong>${updated.personCount} Persons</strong>. New Wait: <strong>${updated.estimatedWaitMinutes}m</strong>.</span>
+            <span class="text-emerald-400 font-mono text-[10px]">REKOGNITION_DONE</span>
+          `;
+        }
+      } catch (err) {
+        // Fallback local simulation
+        runVisionPreset('space_mountain', 'HIGH', 48);
+      }
+    }
+
+    // WhatsApp Chat Handling
+    async function sendUserMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      appendMessage('user', text);
+
+      // Call API
+      try {
+        const res = await fetch(`${API_BASE}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: 'session-web-demo',
+            userMessage: text,
+            phoneNumber: '+1234567890'
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          appendMessage('assistant', data.assistantReply);
+          return;
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+
+      // Offline fallback
+      setTimeout(() => {
+        appendMessage('assistant', '🚀 *Space Mountain* currently has a *75-minute wait*.\n\n💡 *Smart Recommendation*: *Star Tours* is right nearby with only a *15-minute queue*!\n\nWould you like an alert when Space Mountain drops under 30 minutes?');
+      }, 500);
+    }
+
+    function quickPrompt(promptText) {
+      document.getElementById('chat-input').value = promptText;
+      sendUserMessage();
+    }
+
+    function appendMessage(sender, text) {
+      const container = document.getElementById('chat-messages');
+      const isUser = sender === 'user';
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const msgHtml = `
+        <div class="flex ${isUser ? 'justify-end' : 'justify-start'} animate-slide-down">
+          <div class="max-w-[85%] rounded-2xl ${isUser ? 'rounded-tr-none bg-[#005c4b] text-white' : 'rounded-tl-none bg-[#202c33] text-slate-100 border border-slate-800'} p-3 shadow">
+            <div class="leading-relaxed text-xs">${formatWhatsAppText(text)}</div>
+            <div class="flex items-center justify-end gap-1 mt-1 text-[9px] text-slate-400">
+              <span class="font-mono">${timeStr}</span>
+              ${isUser ? '<span class="text-emerald-300">✓✓</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.insertAdjacentHTML('beforeend', msgHtml);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Real-Time Server-Sent Events (SSE) Listener for Proactive WhatsApp Alerts
+    function initEventStream() {
+      const evtSource = new EventSource(`${API_BASE}/api/events`);
+
+      evtSource.addEventListener('ride_updated', e => {
+        const updated = JSON.parse(e.data);
+        const idx = ridesData.findIndex(r => r.rideId === updated.rideId);
+        if (idx >= 0) {
+          ridesData[idx] = updated;
+          renderRides();
+        }
+      });
+
+      evtSource.addEventListener('whatsapp_alert_fired', e => {
+        const alertData = JSON.parse(e.data);
+        showWhatsAppToast(alertData.text);
+        appendMessage('assistant', alertData.text);
+      });
+    }
+
+    function showWhatsAppToast(text) {
+      const toast = document.getElementById('whatsapp-toast');
+      const toastText = document.getElementById('whatsapp-toast-text');
+      toastText.innerHTML = formatWhatsAppText(text);
+      toast.classList.remove('hidden');
+
+      setTimeout(() => {
+        dismissToast();
+      }, 8000);
+    }
+
+    function dismissToast() {
+      document.getElementById('whatsapp-toast').classList.add('hidden');
+    }
+
+    // Bootstrap
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchRides();
+      initEventStream();
+    });
+  </script>
+</body>
+</html>

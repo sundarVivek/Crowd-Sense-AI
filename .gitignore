@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+bin/
+obj/
+
+# Environment Variables & Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Temporary test outputs
+nova_out.json
+nova_pro_out.json
+response.json
+test_msg.json
+test_nova.json
+scratch_bedrock_test.json
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

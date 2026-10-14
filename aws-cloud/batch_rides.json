@@ -1,0 +1,95 @@
+{
+  "Rides": [
+    {
+      "PutRequest": {
+        "Item": {
+          "ride_id": { "S": "star_tours" },
+          "ride_name": { "S": "Star Tours: The Adventures Continue" },
+          "land": { "S": "Tomorrowland" },
+          "person_count": { "N": "14" },
+          "crowd_level": { "S": "LOW" },
+          "estimated_wait_minutes": { "N": "15" },
+          "last_updated": { "S": "2026-10-13T06:30:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "ride_id": { "S": "pirates_caribbean" },
+          "ride_name": { "S": "Pirates of the Caribbean" },
+          "land": { "S": "New Orleans Square" },
+          "person_count": { "N": "24" },
+          "crowd_level": { "S": "MEDIUM" },
+          "estimated_wait_minutes": { "N": "25" },
+          "last_updated": { "S": "2026-10-13T06:30:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "ride_id": { "S": "big_thunder" },
+          "ride_name": { "S": "Big Thunder Mountain Railroad" },
+          "land": { "S": "Frontierland" },
+          "person_count": { "N": "38" },
+          "crowd_level": { "S": "MEDIUM" },
+          "estimated_wait_minutes": { "N": "40" },
+          "last_updated": { "S": "2026-10-13T06:30:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "ride_id": { "S": "peter_pan" },
+          "ride_name": { "S": "Peter Pan's Flight" },
+          "land": { "S": "Fantasyland" },
+          "person_count": { "N": "46" },
+          "crowd_level": { "S": "HIGH" },
+          "estimated_wait_minutes": { "N": "65" },
+          "last_updated": { "S": "2026-10-13T06:30:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "ride_id": { "S": "haunted_mansion" },
+          "ride_name": { "S": "Haunted Mansion" },
+          "land": { "S": "New Orleans Square" },
+          "person_count": { "N": "16" },
+          "crowd_level": { "S": "LOW" },
+          "estimated_wait_minutes": { "N": "20" },
+          "last_updated": { "S": "2026-10-13T06:30:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "ride_id": { "S": "millennium_falcon" },
+          "ride_name": { "S": "Millennium Falcon: Smugglers Run" },
+          "land": { "S": "Star Wars: Galaxy's Edge" },
+          "person_count": { "N": "42" },
+          "crowd_level": { "S": "HIGH" },
+          "estimated_wait_minutes": { "N": "60" },
+          "last_updated": { "S": "2026-10-13T06:30:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "ride_id": { "S": "indiana_jones" },
+          "ride_name": { "S": "Indiana Jones Adventure" },
+          "land": { "S": "Adventureland" },
+          "person_count": { "N": "32" },
+          "crowd_level": { "S": "MEDIUM" },
+          "estimated_wait_minutes": { "N": "35" },
+          "last_updated": { "S": "2026-10-13T06:30:00Z" }
+        }
+      }
+    }
+  ]
+}

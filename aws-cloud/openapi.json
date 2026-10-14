@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Disney Rides API",
+    "version": "1.0.0",
+    "description": "API action group for Disney Crowd Assistant Agent to retrieve ride wait times and register visitor alerts."
+  },
+  "paths": {
+    "/ride/{ride_id}": {
+      "get": {
+        "summary": "Get wait time and crowd level for a specific ride",
+        "description": "Returns current headcount, estimated wait time, and crowd level for a given ride ID.",
+        "operationId": "getRideStatus",
+        "parameters": [
+          {
+            "name": "ride_id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the ride (e.g., space_mountain, star_tours, pirates_caribbean)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of ride status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ride_id": { "type": "string" },
+                    "ride_name": { "type": "string" },
+                    "land": { "type": "string" },
+                    "person_count": { "type": "integer" },
+                    "crowd_level": { "type": "string" },
+                    "estimated_wait_minutes": { "type": "integer" },
+                    "last_updated": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts": {
+      "post": {
+        "summary": "Set an alert for when a ride wait time drops below a threshold",
+        "description": "Registers a proactive WhatsApp alert for the guest when the wait time clears out.",
+        "operationId": "createAlert",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone_number": { "type": "string", "description": "E.164 phone number of the guest" },
+                  "ride_id": { "type": "string", "description": "Ride ID to monitor" },
+                  "target_wait_minutes": { "type": "integer", "description": "Maximum wait minutes threshold" }
+                },
+                "required": ["phone_number", "ride_id", "target_wait_minutes"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Alert successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

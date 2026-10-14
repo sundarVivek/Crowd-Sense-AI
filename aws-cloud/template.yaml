@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Disney Crowd Detection & WhatsApp Assistant (Hackathon Infrastructure)
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.11
+
+Resources:
+  # 1. DynamoDB Tables
+  RidesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Rides
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: ride_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ride_id
+          KeyType: HASH
+
+  UserAlertsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UserAlerts
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: phone_number
+          AttributeType: S
+        - AttributeName: ride_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: phone_number
+          KeyType: HASH
+        - AttributeName: ride_id
+          KeyType: RANGE
+
+  # 2. S3 Bucket for Queue Snapshots
+  QueueSnapshotsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "disney-queue-snapshots-${AWS::AccountId}-${AWS::Region}"
+
+  # 3. Vision Frame Processor Lambda
+  FrameProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/
+      Handler: frame_processor.lambda_handler
+      Environment:
+        Variables:
+          RIDES_TABLE: !Ref RidesTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RidesTable
+        - S3ReadPolicy:
+            BucketName: !Sub "disney-queue-snapshots-${AWS::AccountId}-${AWS::Region}"
+        - Statement:
+            - Effect: Allow
+              Action:
+                - rekognition:DetectLabels
+              Resource: "*"
+      Events:
+        S3NewObject:
+          Type: S3
+          Properties:
+            Bucket: !Ref QueueSnapshotsBucket
+            Events: s3:ObjectCreated:*
+
+  # 4. Bedrock Agent Action Group Resolver Lambda
+  ActionGroupResolverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/
+      Handler: action_group_resolver.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RidesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserAlertsTable
+
+  # 5. WhatsApp Inbound Webhook Function
+  WhatsAppWebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambdas/
+      Handler: whatsapp_webhook.lambda_handler
+      Environment:
+        Variables:
+          BEDROCK_AGENT_ID: ""
+          BEDROCK_AGENT_ALIAS_ID: ""
+          ORIGINATION_PHONE_NUMBER_ID: ""
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeAgent
+                - social-messaging:SendWhatsAppMessage
+              Resource: "*"
+      Events:
+        ApiWebhook:
+          Type: HttpApi
+          Properties:
+            Path: /webhook
+            Method: any
+
+Outputs:
+  RidesTableName:
+    Description: DynamoDB Table for Attraction Queue Data
+    Value: !Ref RidesTable
+
+  UserAlertsTableName:
+    Description: DynamoDB Table for Guest Wait Alerts
+    Value: !Ref UserAlertsTable
+
+  QueueBucketName:
+    Description: S3 Bucket for Attraction Camera Frames
+    Value: !Ref QueueSnapshotsBucket
+
+  ActionGroupResolverArn:
+    Description: Lambda ARN for Amazon Bedrock Agent Action Group
+    Value: !GetAtt ActionGroupResolverFunction.Arn
