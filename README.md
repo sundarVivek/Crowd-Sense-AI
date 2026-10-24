@@ -11,6 +11,15 @@
 
 ---
 
+## 🚀 Live Deployed Application
+
+The project is hosted live on AWS (Free Tier `t3.micro` in `us-east-1`):
+👉 **Live Dashboard URL**: **[http://35.172.225.41](http://35.172.225.41)**  
+👉 **Public DNS**: **[http://ec2-35-172-225-41.compute-1.amazonaws.com](http://ec2-35-172-225-41.compute-1.amazonaws.com)**  
+👉 **Live WhatsApp Concierge Bot**: **`+91 80722 35899`**
+
+---
+
 ## 💡 Overview & Problem Statement
 
 Theme park guests spend up to **60% of their park day waiting in lines**, causing severe vacation fatigue and missed experiences. Traditional park mobile applications suffer from:
