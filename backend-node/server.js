@@ -173,46 +173,31 @@ app.post('/api/rides/analyze-feed/:rideId', upload.single('file'), async (req, r
   }
 });
 
-// 4. Test Ping to Real-Time WhatsApp
-app.post('/api/whatsapp/test-ping', async (req, res) => {
+// 4. Park Operations WhatsApp Dispatch
+app.post('/api/whatsapp/dispatch', async (req, res) => {
   try {
     const targetPhone = req.body?.phoneNumber || process.env.ADMIN_WHATSAPP_PHONE || '+916380505776';
-    const text = `🏰 *Disney Crowd Sense AI Live Ping*\n\n✅ Real-Time WhatsApp is connected via AWS End User Messaging Social!\n⏱️ Timestamp: ${new Date().toLocaleTimeString()}\n\nReady for live guest queue queries & vision updates.`;
+    const text = req.body?.messageText || "🏰 *Disney Park Operations Advisory*\n\nReal-Time WhatsApp Guest Gateway is active.\n⏱️ Timestamp: " + new Date().toLocaleTimeString();
 
     await awsService.sendWhatsAppAlert(targetPhone, text);
 
     storeEvents.emit('whatsapp_live_message', {
-      type: 'OUTBOUND_PING',
-      sender: 'Admin Console',
+      type: 'OUTBOUND_DISPATCH',
+      sender: 'Park Operations Console',
       recipient: targetPhone,
       text: text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     });
 
-    res.json({ success: true, recipient: targetPhone });
+    res.json({ success: true, recipient: targetPhone, message: text });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 5. Alert Subscriptions
-app.get('/api/alerts', (req, res) => {
-  res.json(getAlerts());
-});
-
-app.post('/api/alerts', (req, res) => {
-  const { phoneNumber, rideId, targetWaitMinutes } = req.body;
-  if (!phoneNumber || !rideId) {
-    return res.status(400).json({ error: 'phoneNumber and rideId are required' });
-  }
-
-  const alert = createAlert({
-    phoneNumber,
-    rideId,
-    targetWaitMinutes: parseInt(targetWaitMinutes, 10) || 30
-  });
-
-  res.json({ status: 'success', alert });
+app.post('/api/whatsapp/test-ping', (req, res) => {
+  req.url = '/api/whatsapp/dispatch';
+  app.handle(req, res);
 });
 
 // 6. Health & Status

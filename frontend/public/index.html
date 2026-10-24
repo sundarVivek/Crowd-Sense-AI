@@ -52,10 +52,10 @@
         <div class="flex items-center gap-2">
           <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Disney Crowd Sense AI</span>
           <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-400 border border-orange-500/30">
-            AWS CDS Hackathon MVP
+            Park Operations Command Center
           </span>
         </div>
-        <p class="text-[11px] text-slate-400 hidden sm:block">Real-time Rekognition Queue Analytics & Bedrock WhatsApp Assistant</p>
+        <p class="text-[11px] text-slate-400 hidden sm:block">Real-Time Queue Vision Telemetry & WhatsApp Guest Concierge Gateway</p>
       </div>
     </div>
 
@@ -161,7 +161,7 @@
               <!-- Target WhatsApp Number -->
               <div class="mb-3">
                 <label for="vision-target-phone" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
-                  2. Deliver Alert to Live WhatsApp:
+                  Target Notification Channel (Guest Phone):
                 </label>
                 <div class="flex items-center gap-2">
                   <input id="vision-target-phone" type="text" value="+916380505776" class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-emerald-400 font-mono focus:outline-none focus:border-emerald-500" placeholder="+91..." />
@@ -181,15 +181,15 @@
           <!-- Quick Presets -->
           <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
             <div>
-              <p class="text-xs font-semibold text-slate-300 mb-2">Or Run Live Vision Preset:</p>
+              <p class="text-xs font-semibold text-slate-300 mb-2">Attraction Camera Feed Ingestion Telemetry:</p>
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <button onclick="runVisionPreset('indiana_jones', 'HIGH', 52)" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-left transition">
                   <div class="font-bold text-red-300">Indiana Jones</div>
-                  <div class="text-[10px] text-red-400/80">Packed Queue (52 ppl)</div>
+                  <div class="text-[10px] text-red-400/80">Queue Surge (52 guests)</div>
                 </button>
                 <button onclick="runVisionPreset('indiana_jones', 'LOW', 10)" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-left transition">
                   <div class="font-bold text-emerald-300">Indiana Jones</div>
-                  <div class="text-[10px] text-emerald-400/80">Walk-on (10 ppl)</div>
+                  <div class="text-[10px] text-emerald-400/80">Queue Normal (10 guests)</div>
                 </button>
                 <button onclick="runVisionPreset('space_mountain', 'HIGH', 56)" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-left transition">
                   <div class="font-bold text-red-300">Space Mountain</div>
@@ -212,10 +212,10 @@
       </div>
     </section>
 
-    <!-- RIGHT PANEL: Live AWS Real-Time WhatsApp Operations & Activity Monitor (5 Cols) -->
+        <!-- RIGHT PANEL: Live AWS Real-Time WhatsApp Operations & Guest Dispatch (5 Cols) -->
     <section class="xl:col-span-5 flex flex-col gap-6">
 
-      <!-- Real WhatsApp Connection & Channel Info Card -->
+      <!-- Real WhatsApp Connection & Operational Dispatcher Card -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl backdrop-blur relative overflow-hidden">
         <div class="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
@@ -226,12 +226,12 @@
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <h3 class="text-base font-bold text-white">Live WhatsApp Channel</h3>
+                <h3 class="text-base font-bold text-white">Guest WhatsApp Gateway</h3>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                  REAL WABA ACTIVE
+                  PRODUCTION ONLINE
                 </span>
               </div>
-              <p class="text-xs text-slate-400 mt-0.5">AWS End User Messaging Social • eu-north-1</p>
+              <p class="text-xs text-slate-400 mt-0.5">AWS End User Messaging Social • WhatsApp Cloud API</p>
             </div>
           </div>
         </div>
@@ -239,7 +239,7 @@
         <!-- Channel Credentials Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4 text-xs">
           <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3">
-            <span class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Disney Bot Phone (Origination)</span>
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Park Concierge Bot (WABA)</span>
             <div class="font-mono font-bold text-emerald-400 flex items-center gap-1.5 text-sm">
               <span>+91 80722 35899</span>
             </div>
@@ -247,11 +247,11 @@
           </div>
 
           <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3">
-            <span class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Your Verified WhatsApp</span>
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Target Guest Channel</span>
             <div class="font-mono font-bold text-white flex items-center gap-1.5 text-sm">
               <span>+91 63805 05776</span>
             </div>
-            <span class="text-[10px] text-emerald-400 mt-1 block font-medium">✓ Paired for Live Testing</span>
+            <span class="text-[10px] text-emerald-400 mt-1 block font-medium">✓ Active Mobile Recipient</span>
           </div>
         </div>
 
@@ -274,33 +274,25 @@
           </div>
         </div>
 
-        <!-- Quick Test Ping Action Button -->
-        <div class="flex items-center gap-3">
-          <button onclick="sendTestWhatsAppPing()" id="ping-btn" class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 transition">
-            <span>⚡ Send Live WhatsApp Ping</span>
-          </button>
-        </div>
-        <div id="ping-status" class="mt-2 text-[11px] text-slate-400 text-center font-mono"></div>
-
-        <!-- Instructions for Real Phone -->
-        <div class="mt-4 pt-4 border-t border-slate-800/80">
-          <p class="text-xs font-semibold text-slate-200 mb-1 flex items-center gap-1.5">
-            <span>📱 Test with Your Real Phone:</span>
-          </p>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Open WhatsApp on your mobile phone and send any question to <strong class="text-emerald-400 font-mono">+918072235899</strong>:
-          </p>
-          <div class="mt-2 space-y-1 text-[11px] text-slate-300">
-            <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80 font-mono">
-              "Can I go Indiana Jones Adventure now?"
-            </div>
-            <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80 font-mono">
-              "Which rides have the shortest wait right now?"
-            </div>
-            <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80 font-mono">
-              "Alert me when Space Mountain drops under 30 mins"
-            </div>
+        <!-- Park Operations Broadcast Tool -->
+        <div class="pt-3 border-t border-slate-800/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-200">Park Operations Advisory Dispatcher</span>
+            <span class="text-[10px] text-slate-400 font-mono">BROADCAST_READY</span>
           </div>
+          <div class="space-y-2 mb-3">
+            <select id="dispatch-preset" onchange="updateDispatchText(this.value)" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-medium">
+              <option value="wait_drop">Advisory: Space Mountain queue dropped to 15m (Clear to walk on)</option>
+              <option value="parade">Advisory: Main Street Parade starting in 20 mins</option>
+              <option value="weather">Advisory: Outdoor attraction rain advisory</option>
+              <option value="custom">Custom Park Operations Advisory</option>
+            </select>
+            <textarea id="dispatch-message" rows="2" class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono resize-none">🏰 *Disney Park Advisory:* Space Mountain wait time has dropped to 15 mins! Walk-on queue now open.</textarea>
+          </div>
+          <button onclick="sendOperationalDispatch()" id="dispatch-btn" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 transition">
+            <span>📢 Dispatch WhatsApp Advisory</span>
+          </button>
+          <div id="dispatch-status" class="mt-2 text-[11px] text-slate-400 text-center font-mono"></div>
         </div>
       </div>
 
@@ -309,10 +301,10 @@
         <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
           <div>
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <span>Live WhatsApp Activity Stream</span>
+              <span>Live Guest Communication & Vision Stream</span>
               <span id="activity-counter" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">Real-time</span>
             </h3>
-            <p class="text-[11px] text-slate-400 mt-0.5">Live feed of inbound guest messages, Bedrock answers & Rekognition photo alerts</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Real-time feed of guest inquiries, Bedrock answers & Rekognition photo alerts</p>
           </div>
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Listening to SQS Event Destination"></span>
         </div>
