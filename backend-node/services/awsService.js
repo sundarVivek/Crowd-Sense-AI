@@ -163,11 +163,42 @@ Guidelines:
   return mockStore.generateAiResponse(message, phoneNumber);
 }
 
+async function uploadSnapshotToS3(buffer, filename = `snapshot-${Date.now()}.jpg`, contentType = 'image/jpeg') {
+  const bucket = process.env.QUEUE_BUCKET_NAME || 'crowd-sense-snapshots-1792393252667';
+  const region = process.env.AWS_REGION || 'us-east-1';
+  const cleanName = (filename || 'image.jpg').replace(/[^a-zA-Z0-9.-]/g, '_');
+  const key = `snapshots/${Date.now()}-${cleanName}`;
+
+  if (isAwsConfigured && bucket) {
+    try {
+      const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+      const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+      const client = new S3Client({ region });
+
+      await client.send(new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: buffer,
+        ContentType: contentType
+      }));
+
+      const getCmd = new GetObjectCommand({ Bucket: bucket, Key: key });
+      const presignedUrl = await getSignedUrl(client, getCmd, { expiresIn: 3600 });
+      console.log(`[AWS S3] Uploaded queue snapshot to s3://${bucket}/${key}`);
+      return { key, presignedUrl, bucket };
+    } catch (err) {
+      console.warn('[AWS S3 Upload Warning]:', err.message);
+    }
+  }
+
+  return { key, presignedUrl: null, bucket: 'local-simulation' };
+}
+
 async function sendWhatsAppAlert(recipientPhone, messageText) {
   if (isAwsConfigured && process.env.ORIGINATION_PHONE_NUMBER_ID) {
     try {
       const { SocialMessagingClient, SendWhatsAppMessageCommand } = require('@aws-sdk/client-socialmessaging');
-      const client = new SocialMessagingClient({ region: process.env.AWS_REGION });
+      const client = new SocialMessagingClient({ region: process.env.SOCIAL_MESSAGING_REGION || process.env.AWS_REGION });
       const payload = JSON.stringify({
         messaging_product: 'whatsapp',
         to: recipientPhone,
@@ -179,7 +210,7 @@ async function sendWhatsAppAlert(recipientPhone, messageText) {
         metaApiVersion: 'v20.0',
         message: Buffer.from(payload)
       }));
-      console.log(`[AWS Social Messaging] Dispatched WhatsApp to ${recipientPhone}`);
+      console.log(`[AWS Social Messaging] Dispatched WhatsApp text to ${recipientPhone}`);
       return true;
     } catch (err) {
       console.warn('[AWS Social Messaging Warning]:', err.message);
@@ -190,12 +221,46 @@ async function sendWhatsAppAlert(recipientPhone, messageText) {
   return true;
 }
 
+async function sendWhatsAppImage(recipientPhone, imageUrl, captionText) {
+  if (isAwsConfigured && process.env.ORIGINATION_PHONE_NUMBER_ID && imageUrl) {
+    try {
+      const { SocialMessagingClient, SendWhatsAppMessageCommand } = require('@aws-sdk/client-socialmessaging');
+      const client = new SocialMessagingClient({ region: process.env.SOCIAL_MESSAGING_REGION || process.env.AWS_REGION });
+      const payload = JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: recipientPhone,
+        type: 'image',
+        image: {
+          link: imageUrl,
+          caption: captionText
+        }
+      });
+      await client.send(new SendWhatsAppMessageCommand({
+        originationPhoneNumberId: process.env.ORIGINATION_PHONE_NUMBER_ID,
+        metaApiVersion: 'v20.0',
+        message: Buffer.from(payload)
+      }));
+      console.log(`[AWS Social Messaging] Dispatched WhatsApp image to ${recipientPhone}`);
+      return true;
+    } catch (err) {
+      console.warn('[AWS Social Messaging Image Warning]:', err.message);
+      // Fallback to text alert if image delivery is unsupported or rejected
+      return sendWhatsAppAlert(recipientPhone, captionText);
+    }
+  }
+
+  return sendWhatsAppAlert(recipientPhone, captionText);
+}
+
 module.exports = {
   isAwsConfigured,
   getAllRides,
   upsertRide,
   analyzeQueueImage,
+  uploadSnapshotToS3,
   invokeBedrockAgent,
   sendWhatsAppAlert,
+  sendWhatsAppImage,
   mockStore
 };

@@ -221,6 +221,27 @@ function generateAiResponse(userMessage, phoneNumber = '+1234567890') {
     return `🧚 *Peter Pan's Flight* is busy with a *${ride.estimatedWaitMinutes}-minute wait* (${ride.crowdLevel} crowd) in Fantasyland.`;
   }
 
+  if (query.includes('indiana') || query.includes('jones')) {
+    const ride = getRideById('indiana_jones');
+    const wait = ride ? ride.estimatedWaitMinutes : 35;
+    const crowd = ride ? ride.crowdLevel : 'MEDIUM';
+    if (wait <= 40) {
+      return `🧭 *Indiana Jones Adventure* in Adventureland currently has an estimated wait of *${wait} minutes* (${crowd} crowd).\n\n✨ Yes, you can head over now! The queue is steady and well under the peak surge.`;
+    } else {
+      return `🧭 *Indiana Jones Adventure* is experiencing a longer wait of *${wait} minutes* (${crowd} crowd).\n\n💡 *Smart Recommendation*: *Pirates of the Caribbean* is right nearby in New Orleans Square with a shorter line!`;
+    }
+  }
+
+  if (query.includes('haunted')) {
+    const ride = getRideById('haunted_mansion');
+    return `👻 *Haunted Mansion* in New Orleans Square has an estimated wait of *${ride ? ride.estimatedWaitMinutes : 20} minutes* (${ride ? ride.crowdLevel : 'LOW'} crowd). Perfect time to visit!`;
+  }
+
+  if (query.includes('falcon') || query.includes('millennium') || query.includes('smuggler')) {
+    const ride = getRideById('millennium_falcon');
+    return `🚀 *Millennium Falcon: Smugglers Run* in Star Wars: Galaxy's Edge is at *${ride ? ride.estimatedWaitMinutes : 60} minutes* (${ride ? ride.crowdLevel : 'HIGH'} crowd).`;
+  }
+
   if (query.includes('shortest') || query.includes('least') || query.includes('lowest') || query.includes('best ride') || query.includes('recommend')) {
     const sorted = [...rides].sort((a, b) => a.estimatedWaitMinutes - b.estimatedWaitMinutes).slice(0, 3);
     let reply = `🏰 *Current Shortest Wait Times in the Park:*\n\n`;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Disney Crowd Sense AI - AWS Hackathon MVP</title>
+  <title>Disney Crowd Sense AI - Park Operations & Real-Time WhatsApp</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,17 +128,54 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Upload Box -->
-          <div class="border-2 border-dashed border-slate-800 hover:border-orange-500/50 rounded-2xl p-5 flex flex-col items-center justify-center text-center transition bg-slate-950/40 group">
-            <div class="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition">
-              📷
+          <!-- Upload Box & Target Ride / WhatsApp Controls -->
+          <div class="border-2 border-dashed border-slate-800 hover:border-orange-500/50 rounded-2xl p-5 flex flex-col justify-between transition bg-slate-950/40 group">
+            <div>
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition">
+                  📷
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-slate-200">Upload Camera Snapshot</p>
+                  <p class="text-[10px] text-slate-400">AWS Rekognition person detector & S3 sync</p>
+                </div>
+              </div>
+
+              <!-- Ride Selector -->
+              <div class="mb-2.5">
+                <label for="vision-ride-select" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                  1. Target Attraction (Select Ride):
+                </label>
+                <select id="vision-ride-select" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 font-medium">
+                  <option value="indiana_jones">🧭 Indiana Jones Adventure</option>
+                  <option value="space_mountain">🚀 Space Mountain</option>
+                  <option value="pirates_caribbean">🏴‍☠️ Pirates of the Caribbean</option>
+                  <option value="big_thunder">🚂 Big Thunder Mountain Railroad</option>
+                  <option value="haunted_mansion">👻 Haunted Mansion</option>
+                  <option value="peter_pan">🧚 Peter Pan's Flight</option>
+                  <option value="star_tours">🛸 Star Tours</option>
+                  <option value="matterhorn">🏔️ Matterhorn Bobsleds</option>
+                </select>
+              </div>
+
+              <!-- Target WhatsApp Number -->
+              <div class="mb-3">
+                <label for="vision-target-phone" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                  2. Deliver Alert to Live WhatsApp:
+                </label>
+                <div class="flex items-center gap-2">
+                  <input id="vision-target-phone" type="text" value="+916380505776" class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-emerald-400 font-mono focus:outline-none focus:border-emerald-500" placeholder="+91..." />
+                  <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded-lg font-semibold shrink-0">Live WABA</span>
+                </div>
+              </div>
             </div>
-            <p class="text-xs font-semibold text-slate-200">Upload Camera Snapshot</p>
-            <p class="text-[11px] text-slate-500 mt-1 mb-3">PNG, JPG queue photos for Rekognition analysis</p>
-            <label class="cursor-pointer px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold shadow-lg shadow-orange-500/20 transition">
-              <span>Choose Image</span>
-              <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-            </label>
+
+            <div class="pt-1">
+              <label class="cursor-pointer w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-98 text-white text-xs font-semibold shadow-lg shadow-orange-500/20 transition flex items-center justify-center gap-2">
+                <span>📁 Select Image for Rekognition</span>
+                <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+              </label>
+            </div>
           </div>
 
           <!-- Quick Presets -->
@@ -146,21 +183,21 @@
             <div>
               <p class="text-xs font-semibold text-slate-300 mb-2">Or Run Live Vision Preset:</p>
               <div class="grid grid-cols-2 gap-2 text-xs">
+                <button onclick="runVisionPreset('indiana_jones', 'HIGH', 52)" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-left transition">
+                  <div class="font-bold text-red-300">Indiana Jones</div>
+                  <div class="text-[10px] text-red-400/80">Packed Queue (52 ppl)</div>
+                </button>
+                <button onclick="runVisionPreset('indiana_jones', 'LOW', 10)" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-left transition">
+                  <div class="font-bold text-emerald-300">Indiana Jones</div>
+                  <div class="text-[10px] text-emerald-400/80">Walk-on (10 ppl)</div>
+                </button>
                 <button onclick="runVisionPreset('space_mountain', 'HIGH', 56)" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-left transition">
                   <div class="font-bold text-red-300">Space Mountain</div>
-                  <div class="text-[10px] text-red-400/80">Packed Queue (56 ppl)</div>
+                  <div class="text-[10px] text-red-400/80">Surge (56 ppl)</div>
                 </button>
-                <button onclick="runVisionPreset('space_mountain', 'LOW', 11)" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-left transition">
-                  <div class="font-bold text-emerald-300">Space Mountain</div>
-                  <div class="text-[10px] text-emerald-400/80">Queue Cleared (11 ppl)</div>
-                </button>
-                <button onclick="runVisionPreset('star_tours', 'LOW', 8)" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-left transition">
-                  <div class="font-bold text-emerald-300">Star Tours</div>
-                  <div class="text-[10px] text-emerald-400/80">Walk-on (8 ppl)</div>
-                </button>
-                <button onclick="runVisionPreset('pirates_caribbean', 'MEDIUM', 28)" class="p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-left transition">
-                  <div class="font-bold text-amber-300">Pirates</div>
-                  <div class="text-[10px] text-amber-400/80">Moderate (28 ppl)</div>
+                <button onclick="runVisionPreset('pirates_caribbean', 'LOW', 12)" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-left transition">
+                  <div class="font-bold text-emerald-300">Pirates</div>
+                  <div class="text-[10px] text-emerald-400/80">Short Line (12 ppl)</div>
                 </button>
               </div>
             </div>
@@ -175,123 +212,124 @@
       </div>
     </section>
 
-    <!-- RIGHT PANEL: Guest Mobile WhatsApp Simulator (5 Cols) -->
-    <section class="xl:col-span-5 flex flex-col items-center justify-center">
+    <!-- RIGHT PANEL: Live AWS Real-Time WhatsApp Operations & Activity Monitor (5 Cols) -->
+    <section class="xl:col-span-5 flex flex-col gap-6">
 
-      <!-- Smartphone Device Mockup Container -->
-      <div class="w-full max-w-[420px] bg-[#121b22] border-[6px] border-slate-800 rounded-[3rem] shadow-2xl flex flex-col overflow-hidden h-[740px] relative ring-1 ring-white/10">
+      <!-- Real WhatsApp Connection & Channel Info Card -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl backdrop-blur relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
-        <!-- Top Phone Bezel Notch / Speaker -->
-        <div class="h-6 bg-[#1f2c34] flex items-center justify-center relative select-none">
-          <div class="w-20 h-4 bg-black rounded-b-xl flex items-center justify-center">
-            <div class="w-3 h-3 rounded-full bg-slate-900 border border-slate-800 mr-2"></div>
-            <div class="w-8 h-1 bg-slate-800 rounded-full"></div>
-          </div>
-        </div>
-
-        <!-- In-Phone Real-Time Alert Toast (Shows when Wait Time Drops) -->
-        <div id="whatsapp-toast" class="hidden absolute top-7 left-3 right-3 z-30 bg-[#202c33] border border-emerald-500/40 rounded-2xl p-3 shadow-2xl animate-slide-down">
-          <div class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center text-sm shrink-0">
-              🔔
-            </div>
-            <div class="flex-1 text-xs">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-emerald-400">WhatsApp Notification</span>
-                <span class="text-[10px] text-slate-400">now</span>
-              </div>
-              <p id="whatsapp-toast-text" class="text-slate-200 text-[11px] mt-0.5 leading-snug">
-                Wait time alert for Space Mountain!
-              </p>
-            </div>
-            <button onclick="dismissToast()" class="text-slate-400 hover:text-white text-xs">✕</button>
-          </div>
-        </div>
-
-        <!-- WhatsApp Header -->
-        <div class="bg-[#1f2c34] px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-white shrink-0">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
           <div class="flex items-center gap-3">
-            <button class="text-slate-300 hover:text-white text-lg">←</button>
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-xl shadow relative ring-1 ring-white/20">
-              🏰
-              <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-[#1f2c34]"></span>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl shadow-inner">
+              💬
             </div>
             <div>
-              <div class="text-sm font-bold flex items-center gap-1.5 leading-tight">
-                <span>Disney Assistant</span>
-                <span class="text-[11px] text-emerald-400" title="Verified Business">✓</span>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-bold text-white">Live WhatsApp Channel</h3>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  REAL WABA ACTIVE
+                </span>
               </div>
-              <div class="text-[10px] text-emerald-400 font-medium">AWS Bedrock & Social Messaging</div>
-            </div>
-          </div>
-
-          <!-- Top Call / Menu Icons -->
-          <div class="flex items-center gap-4 text-slate-300 text-sm">
-            <button title="Video Call" class="hover:text-white">📹</button>
-            <button title="Phone Call" class="hover:text-white">📞</button>
-            <button title="Menu" class="hover:text-white">⋮</button>
-          </div>
-        </div>
-
-        <!-- Quick Prompt Chips -->
-        <div class="bg-[#182229] px-3 py-2 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto custom-scroll text-[11px] shrink-0">
-          <button onclick="quickPrompt('What is the wait time for Space Mountain?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
-            🚀 Space Mountain
-          </button>
-          <button onclick="quickPrompt('Which rides have the shortest wait right now?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
-            ✨ Shortest lines
-          </button>
-          <button onclick="quickPrompt('Alert me when Space Mountain drops under 30 mins')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
-            🔔 Set 30m Alert
-          </button>
-          <button onclick="quickPrompt('Pirates of the Caribbean wait time?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-[#202c33] hover:bg-[#2a3942] text-slate-200 border border-slate-700/60 transition">
-            🏴‍☠️ Pirates
-          </button>
-        </div>
-
-        <!-- WhatsApp Chat Messages Body -->
-        <div id="chat-messages" class="flex-1 whatsapp-bg p-4 overflow-y-auto space-y-3 custom-scroll text-xs">
-          <!-- Date Pill -->
-          <div class="text-center my-1">
-            <span class="bg-[#182229] text-[10px] text-slate-400 font-medium px-2.5 py-1 rounded-lg uppercase tracking-wider">
-              Today
-            </span>
-          </div>
-
-          <!-- Welcome Message -->
-          <div class="flex justify-start">
-            <div class="max-w-[85%] rounded-2xl rounded-tl-none p-3 shadow-md bg-[#202c33] text-slate-100 border border-slate-800">
-              <p class="leading-relaxed">
-                👋 *Welcome to Disneyland!* I'm your AI Crowd Assistant powered by Amazon Bedrock & Rekognition.
-              </p>
-              <p class="mt-2 text-slate-300 leading-relaxed">
-                Ask me about any ride queue, find shortest lines, or let me know if you want a WhatsApp alert when a busy ride clears up!
-              </p>
-              <span class="text-[9px] text-slate-400 block text-right mt-1.5 font-mono">11:20 AM</span>
+              <p class="text-xs text-slate-400 mt-0.5">AWS End User Messaging Social • eu-north-1</p>
             </div>
           </div>
         </div>
 
-        <!-- WhatsApp Input Area -->
-        <div class="bg-[#1f2c34] p-3 flex items-center gap-2 border-t border-slate-800 shrink-0">
-          <button class="text-slate-400 hover:text-white text-base">😊</button>
-          <button class="text-slate-400 hover:text-white text-base">📎</button>
-          <input 
-            type="text" 
-            id="chat-input" 
-            placeholder="Type a message..." 
-            class="flex-1 bg-[#2a3942] text-xs text-white placeholder-slate-400 px-3.5 py-2.5 rounded-2xl border border-slate-700/60 focus:outline-none focus:border-emerald-500"
-            onkeypress="if(event.key === 'Enter') sendUserMessage()"
-          />
-          <button 
-            onclick="sendUserMessage()" 
-            class="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white flex items-center justify-center transition shadow-lg shadow-emerald-900/30 shrink-0"
-          >
-            ➤
-          </button>
+        <!-- Channel Credentials Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4 text-xs">
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3">
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Disney Bot Phone (Origination)</span>
+            <div class="font-mono font-bold text-emerald-400 flex items-center gap-1.5 text-sm">
+              <span>+91 80722 35899</span>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">Meta Verified Business Account</span>
+          </div>
+
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-3">
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block mb-1">Your Verified WhatsApp</span>
+            <div class="font-mono font-bold text-white flex items-center gap-1.5 text-sm">
+              <span>+91 63805 05776</span>
+            </div>
+            <span class="text-[10px] text-emerald-400 mt-1 block font-medium">✓ Paired for Live Testing</span>
+          </div>
         </div>
 
+        <!-- Live Architecture Flow -->
+        <div class="bg-slate-950/40 border border-slate-800/60 rounded-2xl p-3 text-[11px] text-slate-300 space-y-2 mb-4">
+          <div class="flex items-center justify-between font-semibold text-slate-400 text-[10px] uppercase tracking-wider">
+            <span>Event Routing Pipeline</span>
+            <span class="text-emerald-400 font-mono text-[10px]">SQS_POLLER_ACTIVE</span>
+          </div>
+          <div class="flex items-center gap-1 text-[11px] text-slate-400 flex-wrap">
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-200">WhatsApp App</span>
+            <span>➔</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-200">AWS Social Messaging</span>
+            <span>➔</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-200">SNS</span>
+            <span>➔</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-200">SQS</span>
+            <span>➔</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-medium">Bedrock Nova Lite</span>
+          </div>
+        </div>
+
+        <!-- Quick Test Ping Action Button -->
+        <div class="flex items-center gap-3">
+          <button onclick="sendTestWhatsAppPing()" id="ping-btn" class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 transition">
+            <span>⚡ Send Live WhatsApp Ping</span>
+          </button>
+        </div>
+        <div id="ping-status" class="mt-2 text-[11px] text-slate-400 text-center font-mono"></div>
+
+        <!-- Instructions for Real Phone -->
+        <div class="mt-4 pt-4 border-t border-slate-800/80">
+          <p class="text-xs font-semibold text-slate-200 mb-1 flex items-center gap-1.5">
+            <span>📱 Test with Your Real Phone:</span>
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Open WhatsApp on your mobile phone and send any question to <strong class="text-emerald-400 font-mono">+918072235899</strong>:
+          </p>
+          <div class="mt-2 space-y-1 text-[11px] text-slate-300">
+            <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80 font-mono">
+              "Can I go Indiana Jones Adventure now?"
+            </div>
+            <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80 font-mono">
+              "Which rides have the shortest wait right now?"
+            </div>
+            <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800/80 font-mono">
+              "Alert me when Space Mountain drops under 30 mins"
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Real-Time Activity & Outbound Dispatch Stream Card -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl backdrop-blur flex-1 flex flex-col min-h-[380px]">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>Live WhatsApp Activity Stream</span>
+              <span id="activity-counter" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">Real-time</span>
+            </h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Live feed of inbound guest messages, Bedrock answers & Rekognition photo alerts</p>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Listening to SQS Event Destination"></span>
+        </div>
+
+        <!-- Activity Stream List -->
+        <div id="live-activity-stream" class="flex-1 space-y-3 overflow-y-auto max-h-[360px] custom-scroll pr-1 text-xs">
+          <!-- Initial status item -->
+          <div class="bg-slate-950/50 border border-slate-800/70 rounded-2xl p-3.5 text-slate-400">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">● SYSTEM READY</span>
+              <span class="text-[10px] font-mono text-slate-500">Live</span>
+            </div>
+            <p class="text-slate-300 text-xs">Connected to AWS SQS queue. Messages sent from or received on <strong class="text-emerald-400">+918072235899</strong> will appear here in real time.</p>
+          </div>
+        </div>
+      </div>
+
     </section>
 
   </main>
@@ -357,8 +395,11 @@
               </div>
             </div>
 
-            <!-- Fast Simulation Buttons -->
-            <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
+            <!-- Fast Simulation Buttons & Upload -->
+            <div class="flex items-center gap-2 w-full md:w-auto shrink-0 flex-wrap">
+              <button onclick="triggerRideUpload('${ride.rideId}')" class="flex-1 md:flex-initial text-xs bg-orange-600/20 hover:bg-orange-600/30 text-orange-300 border border-orange-600/40 px-3 py-1.5 rounded-xl transition font-medium flex items-center justify-center gap-1.5" title="Upload camera snapshot for ${ride.rideName}">
+                <span>📷 Upload Feed</span>
+              </button>
               <button onclick="simulateSurge('${ride.rideId}')" class="flex-1 md:flex-initial text-xs bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-600/40 px-3 py-1.5 rounded-xl transition font-medium flex items-center justify-center gap-1">
                 <span>Surge</span>
                 <span class="text-[10px] opacity-80">(75m)</span>
@@ -371,6 +412,19 @@
           </div>
         `;
       }).join('');
+    }
+
+    let selectedRideForUpload = null;
+
+    function triggerRideUpload(rideId) {
+      selectedRideForUpload = rideId;
+      const select = document.getElementById('vision-ride-select');
+      if (select) select.value = rideId;
+      const fileInput = document.getElementById('image-upload');
+      if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+      }
     }
 
     function filterLand(land) {
@@ -456,22 +510,30 @@
       }, 700);
     }
 
-    // Image Upload
+    // Image Upload (With per-ride selection & real WhatsApp dispatch)
     async function handleImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
+      const rideId = selectedRideForUpload || document.getElementById('vision-ride-select')?.value || 'indiana_jones';
+      const targetPhone = document.getElementById('vision-target-phone')?.value.trim() || '+916380505776';
+      selectedRideForUpload = null;
+
+      const rideObj = ridesData.find(r => r.rideId.toLowerCase() === rideId.toLowerCase());
+      const rideDisplayName = rideObj ? rideObj.rideName : rideId.replace(/_/g, ' ').toUpperCase();
+
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('targetPhone', targetPhone);
 
       const statusEl = document.getElementById('vision-status');
       statusEl.innerHTML = `
-        <span class="text-blue-400 animate-pulse">Uploading frame to S3 & executing Amazon Rekognition...</span>
-        <span class="text-blue-400 font-mono text-[10px]">FRAME_INGESTION</span>
+        <span class="text-blue-400 animate-pulse">Uploading snapshot for <strong>${rideDisplayName}</strong> to S3 & executing Rekognition...</span>
+        <span class="text-blue-400 font-mono text-[10px]">AWS_REKOGNITION_INGEST</span>
       `;
 
       try {
-        const res = await fetch(`${API_BASE}/api/rides/analyze-feed/space_mountain`, {
+        const res = await fetch(`${API_BASE}/api/rides/analyze-feed/${rideId}`, {
           method: 'POST',
           body: formData
         });
@@ -482,79 +544,116 @@
           renderRides();
 
           statusEl.innerHTML = `
-            <span class="text-emerald-400">Amazon Rekognition detected <strong>${updated.personCount} Persons</strong>. New Wait: <strong>${updated.estimatedWaitMinutes}m</strong>.</span>
-            <span class="text-emerald-400 font-mono text-[10px]">REKOGNITION_DONE</span>
+            <span class="text-emerald-400">Rekognition detected <strong>${updated.personCount} Persons</strong> (${updated.estimatedWaitMinutes}m wait). WhatsApp delivered to <strong>${targetPhone}</strong>!</span>
+            <span class="text-emerald-400 font-mono text-[10px]">REAL_WHATSAPP_SENT</span>
           `;
+        } else {
+          const errData = await res.json();
+          statusEl.innerHTML = `<span class="text-red-400">Rekognition error: ${errData.error || 'Failed'}</span>`;
         }
       } catch (err) {
-        // Fallback local simulation
-        runVisionPreset('space_mountain', 'HIGH', 48);
+        statusEl.innerHTML = `<span class="text-red-400">Network upload failed: ${err.message}</span>`;
       }
     }
 
-    // WhatsApp Chat Handling
-    async function sendUserMessage() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
+    // Live WhatsApp Ping & Operations
+    async function sendTestWhatsAppPing() {
+      const btn = document.getElementById('ping-btn');
+      const status = document.getElementById('ping-status');
+      const targetPhone = document.getElementById('vision-target-phone')?.value.trim() || '+916380505776';
 
-      input.value = '';
-      appendMessage('user', text);
+      btn.disabled = true;
+      btn.classList.add('opacity-75');
+      btn.innerHTML = '<span>⏳ Sending via AWS Social Messaging...</span>';
+      status.innerHTML = '<span class="text-slate-400">Contacting AWS End User Messaging Social...</span>';
 
-      // Call API
       try {
-        const res = await fetch(`${API_BASE}/api/chat`, {
+        const res = await fetch(`${API_BASE}/api/whatsapp/test-ping`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionId: 'session-web-demo',
-            userMessage: text,
-            phoneNumber: '+1234567890'
-          })
+          body: JSON.stringify({ phoneNumber: targetPhone })
         });
-
+        const data = await res.json();
         if (res.ok) {
-          const data = await res.json();
-          appendMessage('assistant', data.assistantReply);
-          return;
+          status.innerHTML = `<span class="text-emerald-400 font-semibold">✓ Live WhatsApp Ping delivered to ${data.recipient}! Check your phone.</span>`;
+        } else {
+          status.innerHTML = `<span class="text-red-400 font-semibold">Failed: ${data.error || 'Check AWS configuration'}</span>`;
         }
       } catch (err) {
-        console.warn(err);
+        status.innerHTML = `<span class="text-red-400 font-semibold">Network error: ${err.message}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+        btn.innerHTML = '<span>⚡ Send Live WhatsApp Ping</span>';
+      }
+    }
+
+    // Live Activity Stream Rendering
+    let activityCount = 0;
+    function renderActivityItem(activity) {
+      const container = document.getElementById('live-activity-stream');
+      if (!container) return;
+
+      activityCount++;
+      const badgeEl = document.getElementById('activity-counter');
+      if (badgeEl) badgeEl.textContent = `${activityCount} events`;
+
+      const timeStr = activity.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      let badgeHtml = '';
+      let borderClass = 'border-slate-800/80';
+      let bgClass = 'bg-slate-950/60';
+
+      if (activity.type === 'INBOUND') {
+        badgeHtml = `<span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold text-[10px]">📱 INBOUND GUEST</span>`;
+        borderClass = 'border-blue-500/30';
+        bgClass = 'bg-blue-950/20';
+      } else if (activity.type === 'OUTBOUND') {
+        badgeHtml = `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-[10px]">🤖 BEDROCK CONCIERGE</span>`;
+        borderClass = 'border-emerald-500/30';
+        bgClass = 'bg-emerald-950/20';
+      } else if (activity.type === 'REKOGNITION_IMAGE') {
+        badgeHtml = `<span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 font-bold text-[10px]">📸 REKOGNITION VISION DISPATCH</span>`;
+        borderClass = 'border-orange-500/30';
+        bgClass = 'bg-orange-950/20';
+      } else if (activity.type === 'PROACTIVE_ALERT') {
+        badgeHtml = `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-[10px]">🔔 QUEUE DROP ALERT</span>`;
+        borderClass = 'border-amber-500/30';
+        bgClass = 'bg-amber-950/20';
+      } else {
+        badgeHtml = `<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-bold text-[10px]">⚡ LIVE PING</span>`;
       }
 
-      // Offline fallback
-      setTimeout(() => {
-        appendMessage('assistant', '🚀 *Space Mountain* currently has a *75-minute wait*.\n\n💡 *Smart Recommendation*: *Star Tours* is right nearby with only a *15-minute queue*!\n\nWould you like an alert when Space Mountain drops under 30 minutes?');
-      }, 500);
-    }
-
-    function quickPrompt(promptText) {
-      document.getElementById('chat-input').value = promptText;
-      sendUserMessage();
-    }
-
-    function appendMessage(sender, text) {
-      const container = document.getElementById('chat-messages');
-      const isUser = sender === 'user';
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      const msgHtml = `
-        <div class="flex ${isUser ? 'justify-end' : 'justify-start'} animate-slide-down">
-          <div class="max-w-[85%] rounded-2xl ${isUser ? 'rounded-tr-none bg-[#005c4b] text-white' : 'rounded-tl-none bg-[#202c33] text-slate-100 border border-slate-800'} p-3 shadow">
-            <div class="leading-relaxed text-xs">${formatWhatsAppText(text)}</div>
-            <div class="flex items-center justify-end gap-1 mt-1 text-[9px] text-slate-400">
-              <span class="font-mono">${timeStr}</span>
-              ${isUser ? '<span class="text-emerald-300">✓✓</span>' : ''}
-            </div>
+      let extraMediaHtml = '';
+      if (activity.s3Url) {
+        extraMediaHtml = `
+          <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+            <span class="text-slate-400">S3 Queue Snapshot Attached</span>
+            <a href="${activity.s3Url}" target="_blank" class="text-orange-400 hover:underline flex items-center gap-1 font-medium">
+              <span>View Snapshot ↗</span>
+            </a>
           </div>
+        `;
+      }
+
+      const cardHtml = `
+        <div class="${bgClass} border ${borderClass} rounded-2xl p-3.5 shadow animate-slide-down transition">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              ${badgeHtml}
+              <span class="text-[11px] font-mono text-slate-400">${activity.sender || ''} ${activity.recipient ? '➔ ' + activity.recipient : ''}</span>
+            </div>
+            <span class="text-[10px] font-mono text-slate-500">${timeStr}</span>
+          </div>
+          <div class="text-slate-200 text-xs leading-relaxed whitespace-pre-wrap">${formatWhatsAppText(activity.text)}</div>
+          ${extraMediaHtml}
         </div>
       `;
 
-      container.insertAdjacentHTML('beforeend', msgHtml);
-      container.scrollTop = container.scrollHeight;
+      container.insertAdjacentHTML('afterbegin', cardHtml);
     }
 
-    // Real-Time Server-Sent Events (SSE) Listener for Proactive WhatsApp Alerts
+    // Real-Time Server-Sent Events (SSE) Listener for Rides & Live WhatsApp Activity
     function initEventStream() {
       const evtSource = new EventSource(`${API_BASE}/api/events`);
 
@@ -567,26 +666,10 @@
         }
       });
 
-      evtSource.addEventListener('whatsapp_alert_fired', e => {
-        const alertData = JSON.parse(e.data);
-        showWhatsAppToast(alertData.text);
-        appendMessage('assistant', alertData.text);
+      evtSource.addEventListener('whatsapp_live_message', e => {
+        const activity = JSON.parse(e.data);
+        renderActivityItem(activity);
       });
-    }
-
-    function showWhatsAppToast(text) {
-      const toast = document.getElementById('whatsapp-toast');
-      const toastText = document.getElementById('whatsapp-toast-text');
-      toastText.innerHTML = formatWhatsAppText(text);
-      toast.classList.remove('hidden');
-
-      setTimeout(() => {
-        dismissToast();
-      }, 8000);
-    }
-
-    function dismissToast() {
-      document.getElementById('whatsapp-toast').classList.add('hidden');
     }
 
     // Bootstrap
