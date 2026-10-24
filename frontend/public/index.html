@@ -80,6 +80,51 @@
     </div>
   </header>
 
+  <!-- Top Operational KPI Bar -->
+  <section class="max-w-[1600px] w-full mx-auto px-4 md:px-6 pt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
+      <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center text-lg">
+        👥
+      </div>
+      <div>
+        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Queue Occupancy</span>
+        <div id="kpi-total-guests" class="text-xl font-extrabold text-white">-- guests</div>
+      </div>
+    </div>
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
+      <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-lg">
+        ⏱️
+      </div>
+      <div>
+        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Avg Wait Time</span>
+        <div id="kpi-avg-wait" class="text-xl font-extrabold text-white">-- mins</div>
+      </div>
+    </div>
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
+      <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center text-lg">
+        ⚡
+      </div>
+      <div>
+        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Peak Attraction</span>
+        <div id="kpi-peak-ride" class="text-xl font-extrabold text-white">--</div>
+      </div>
+    </div>
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+        📱
+      </div>
+      <div>
+        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gateway Status</span>
+        <div class="text-xl font-extrabold text-emerald-400 flex items-center gap-2">
+          <span>Active</span>
+          <span class="text-xs font-mono font-normal text-slate-400">(WABA Live)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
   <!-- Main Dual-Panel Workspace -->
   <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 md:p-6 grid grid-cols-1 xl:grid-cols-12 gap-6">
 
@@ -330,7 +375,7 @@
   <script>
     let ridesData = [];
     let currentFilter = 'ALL';
-    const API_BASE = window.location.origin.includes('localhost') ? window.location.origin : 'http://localhost:5000';
+    const API_BASE = window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5000';
 
     // Format WhatsApp markdown (bold *text*, bullet points, emojis)
     function formatWhatsAppText(text) {
@@ -363,6 +408,7 @@
         : ridesData.filter(r => r.land === currentFilter);
 
       document.getElementById('rides-count-badge').textContent = `${filtered.length} Attractions`;
+      updateKpis(ridesData);
 
       container.innerHTML = filtered.map(ride => {
         const isHigh = ride.crowdLevel === 'HIGH';
@@ -548,26 +594,68 @@
       }
     }
 
-    // Live WhatsApp Ping & Operations
-    async function sendTestWhatsAppPing() {
-      const btn = document.getElementById('ping-btn');
-      const status = document.getElementById('ping-status');
+    
+    // Operational KPI Computation
+    function updateKpis(rides) {
+      if (!rides || !rides.length) return;
+      const totalGuests = rides.reduce((sum, r) => sum + (r.personCount || 0), 0);
+      const avgWait = Math.round(rides.reduce((sum, r) => sum + (r.estimatedWaitMinutes || 0), 0) / rides.length);
+      let peakRide = rides[0];
+      for (const r of rides) {
+        if ((r.estimatedWaitMinutes || 0) > (peakRide.estimatedWaitMinutes || 0)) {
+          peakRide = r;
+        }
+      }
+      const totalEl = document.getElementById('kpi-total-guests');
+      const avgEl = document.getElementById('kpi-avg-wait');
+      const peakEl = document.getElementById('kpi-peak-ride');
+      if (totalEl) totalEl.textContent = `${totalGuests} guests`;
+      if (avgEl) avgEl.textContent = `${avgWait} mins`;
+      if (peakEl) peakEl.textContent = `${peakRide.rideName} (${peakRide.estimatedWaitMinutes}m)`;
+    }
+
+    // Park Operations Advisory Dispatcher Presets
+    function updateDispatchText(preset) {
+      const textarea = document.getElementById('dispatch-message');
+      if (!textarea) return;
+      if (preset === 'wait_drop') {
+        textarea.value = '🏰 *Disney Park Advisory:* Space Mountain wait time has dropped to 15 mins! Walk-on queue now open.';
+      } else if (preset === 'parade') {
+        textarea.value = '✨ *Disney Park Advisory:* Main Street Electrical Parade starts in 20 minutes! Recommended viewing at Central Plaza.';
+      } else if (preset === 'weather') {
+        textarea.value = '🌧️ *Disney Operations Update:* Weather advisory in effect for outdoor coasters. Indoor attractions operating normally with low wait times.';
+      } else if (preset === 'custom') {
+        textarea.value = '🏰 *Disney Park Advisory:* ';
+        textarea.focus();
+      }
+    }
+
+    // Operational WhatsApp Dispatch
+    async function sendOperationalDispatch() {
+      const btn = document.getElementById('dispatch-btn');
+      const status = document.getElementById('dispatch-status');
       const targetPhone = document.getElementById('vision-target-phone')?.value.trim() || '+916380505776';
+      const messageText = document.getElementById('dispatch-message')?.value.trim();
+
+      if (!messageText) {
+        status.innerHTML = '<span class="text-amber-400">Please enter an advisory message.</span>';
+        return;
+      }
 
       btn.disabled = true;
       btn.classList.add('opacity-75');
-      btn.innerHTML = '<span>⏳ Sending via AWS Social Messaging...</span>';
-      status.innerHTML = '<span class="text-slate-400">Contacting AWS End User Messaging Social...</span>';
+      btn.innerHTML = '<span>⏳ Dispatching via AWS Social Messaging...</span>';
+      status.innerHTML = '<span class="text-slate-400">Transmitting to AWS End User Messaging Social...</span>';
 
       try {
-        const res = await fetch(`${API_BASE}/api/whatsapp/test-ping`, {
+        const res = await fetch(`${API_BASE}/api/whatsapp/dispatch`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phoneNumber: targetPhone })
+          body: JSON.stringify({ phoneNumber: targetPhone, messageText: messageText })
         });
         const data = await res.json();
         if (res.ok) {
-          status.innerHTML = `<span class="text-emerald-400 font-semibold">✓ Live WhatsApp Ping delivered to ${data.recipient}! Check your phone.</span>`;
+          status.innerHTML = `<span class="text-emerald-400 font-semibold">✓ Advisory dispatched to ${data.recipient}! Check phone.</span>`;
         } else {
           status.innerHTML = `<span class="text-red-400 font-semibold">Failed: ${data.error || 'Check AWS configuration'}</span>`;
         }
@@ -576,7 +664,7 @@
       } finally {
         btn.disabled = false;
         btn.classList.remove('opacity-75');
-        btn.innerHTML = '<span>⚡ Send Live WhatsApp Ping</span>';
+        btn.innerHTML = '<span>📢 Dispatch WhatsApp Advisory</span>';
       }
     }
 
